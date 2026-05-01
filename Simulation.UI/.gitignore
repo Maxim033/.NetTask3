@@ -1,0 +1,44 @@
+## .NET / WPF Project Gitignore
+
+# Build outputs
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# IDE & Editor files
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.csproj.user
+*.DotSettings
+*.DotSettings.user
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# OS & Misc
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Project-specific (из вашего кода)
+debug.log
+*.log
+*.tmp
+*.bak

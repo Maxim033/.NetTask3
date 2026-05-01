@@ -1,0 +1,40 @@
+<Window x:Class="Simulation.UI.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:Simulation.UI.Views"
+        Title="Симуляция пешеходных переходов" 
+        Height="800" Width="1000">
+    
+    <DockPanel>
+        <Button Content="➕ ДОБАВИТЬ ПЕРЕХОД" 
+                Command="{Binding AddCrossingCommand}" 
+                DockPanel.Dock="Top" Height="60" FontSize="20" 
+                Margin="10" Background="#4CAF50" Foreground="White"
+                FontWeight="Bold">
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        
+        <ScrollViewer DockPanel.Dock="Bottom" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding Crossings}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="2" 
+                                CornerRadius="10" Margin="10" Padding="5">
+                            <views:CrossingView Width="800" Height="600"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

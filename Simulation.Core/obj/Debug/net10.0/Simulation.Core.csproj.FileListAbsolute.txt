@@ -1,0 +1,12 @@
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\bin\Debug\net10.0\Simulation.Core.deps.json
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\bin\Debug\net10.0\Simulation.Core.dll
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\bin\Debug\net10.0\Simulation.Core.pdb
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\obj\Debug\net10.0\Simulation.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\obj\Debug\net10.0\Simulation.Core.AssemblyInfoInputs.cache
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\obj\Debug\net10.0\Simulation.Core.AssemblyInfo.cs
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\obj\Debug\net10.0\Simulation.Core.csproj.CoreCompileInputs.cache
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\obj\Debug\net10.0\Simulation.Core.sourcelink.json
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\obj\Debug\net10.0\Simulation.Core.dll
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\obj\Debug\net10.0\refint\Simulation.Core.dll
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\obj\Debug\net10.0\Simulation.Core.pdb
+C:\Users\Максим\Desktop\Lab3\Simulation.Core\obj\Debug\net10.0\ref\Simulation.Core.dll
