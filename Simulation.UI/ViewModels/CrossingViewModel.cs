@@ -37,25 +37,50 @@ namespace Simulation.UI.ViewModels
 
         private void CreateInitialEntities(SimulationConfig config)
         {
-            // 🚶 Пешеходы
-            _simulator.AddEntity(new Pedestrian { X = 50, Y = config.CanvasHeight / 2 - 30, Speed = config.PedestrianSpeed, IsActive = true, Direction = 1, TargetX = config.CanvasWidth - 50 });
-            _simulator.AddEntity(new Pedestrian { X = 30, Y = config.CanvasHeight / 2 + 30, Speed = config.PedestrianSpeed, IsActive = true, Direction = 1, TargetX = config.CanvasWidth - 50 });
-            _simulator.AddEntity(new Pedestrian { X = config.CanvasWidth - 50, Y = config.CanvasHeight / 2, Speed = config.PedestrianSpeed, IsActive = true, Direction = -1, TargetX = 50 });
+            double centerX = config.CanvasWidth / 2;
+            
+            // 🚶 Пешеходы стартуют с тротуаров (±100px от центра дороги)
+            _simulator.AddEntity(new Pedestrian 
+            { 
+                X = centerX - 100, 
+                Y = config.CanvasHeight / 2 - 20, 
+                Speed = config.PedestrianSpeed, 
+                IsActive = true, 
+                Direction = 1 
+            });
+            
+            _simulator.AddEntity(new Pedestrian 
+            { 
+                X = centerX - 120, 
+                Y = config.CanvasHeight / 2 + 20, 
+                Speed = config.PedestrianSpeed, 
+                IsActive = true, 
+                Direction = 1 
+            });
+            
+            _simulator.AddEntity(new Pedestrian 
+            { 
+                X = centerX + 100, 
+                Y = config.CanvasHeight / 2, 
+                Speed = config.PedestrianSpeed, 
+                IsActive = true, 
+                Direction = -1 
+            });
 
-            //  Машины (2 полосы, стартуют сверху)
+            // 🚗 Машины (2 полосы)
             for (int i = 0; i < 5; i++)
             {
                 double xOffset = (i % 2 == 0) ? -20 : 20;
                 _simulator.AddEntity(new Car
                 {
-                    X = config.CanvasWidth / 2 + xOffset,
+                    X = centerX + xOffset,
                     Y = -100 - (i * 140),
                     Speed = config.CarSpeed,
                     IsActive = true,
                     Lane = i % 2,
                     Direction = 1,
                     IsEmergency = false,
-                    IsStopped = false // Начинают движение сразу
+                    IsStopped = false
                 });
             }
         }
@@ -73,12 +98,20 @@ namespace Simulation.UI.ViewModels
                 var vm = Entities.FirstOrDefault(x => x.Id.Equals(e.Entity.Id));
                 if (vm == null)
                 {
-                    vm = new EntityViewModel { Id = e.Entity.Id, X = e.Entity.X, Y = e.Entity.Y, IsVisible = e.Entity.IsActive };
+                    vm = new EntityViewModel 
+                    { 
+                        Id = e.Entity.Id, 
+                        X = e.Entity.X, 
+                        Y = e.Entity.Y, 
+                        IsVisible = e.Entity.IsActive 
+                    };
                     
+                    // 🔥 Маппинг типов для XAML (включая раненого пешехода)
                     vm.Type = e.Entity switch
                     {
                         Car c when c.IsEmergency => "Car_Emergency",
                         Car c when c.IsTowed     => "Car_Towed",
+                        Pedestrian p when p.IsInjured => "Pedestrian_Injured",
                         Car                      => "Car",
                         Pedestrian               => "Pedestrian",
                         _                        => "Unknown"

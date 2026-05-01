@@ -4,9 +4,11 @@ namespace Simulation.Core.Models
     {
         public bool IsCrossing { get; set; }
         public double CrossingProgress { get; set; }
-        
-        // 1 = слева направо, -1 = справа налево
         public int Direction { get; set; } = 1;
         public double TargetX { get; set; }
+        
+        
+        public bool IsInjured { get; set; }
+        public double InjuryTime { get; set; } // время с момента ДТП
     }
 }

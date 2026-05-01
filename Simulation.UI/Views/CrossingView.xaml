@@ -12,7 +12,6 @@
         <Rectangle Fill="#555" Width="100" HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="0,50"/>
 
         
-
         <Canvas Width="100" Height="110" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Rectangle Canvas.Left="5"  Width="7" Height="100" Fill="White"/>
             <Rectangle Canvas.Left="20" Width="7" Height="100" Fill="White"/>
@@ -21,6 +20,13 @@
             <Rectangle Canvas.Left="65" Width="7" Height="100" Fill="White"/>
             <Rectangle Canvas.Left="80" Width="7" Height="100" Fill="White"/>
         </Canvas>
+
+        
+        <Rectangle Fill="#FFF" Width="100" Height="3" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center" 
+                   Margin="0,-200,0,0"
+                   Opacity="0.6"/>
 
         
         <Border Background="White" CornerRadius="5" Padding="10" Margin="10"
@@ -62,11 +68,35 @@
                             <Style TargetType="Ellipse">
                                 <Setter Property="Fill" Value="Gray"/>
                                 <Style.Triggers>
+                                    <!-- 🚶 Обычный пешеход -->
                                     <DataTrigger Binding="{Binding Type}" Value="Pedestrian">
                                         <Setter Property="Fill" Value="#4CAF50"/>
                                     </DataTrigger>
+                                    
+                                    <!-- 🔥 Раненый пешеход (красный, чуть больше) -->
+                                    <DataTrigger Binding="{Binding Type}" Value="Pedestrian_Injured">
+                                        <Setter Property="Fill" Value="#E53935"/>
+                                        <Setter Property="Width" Value="28"/>
+                                        <Setter Property="Height" Value="28"/>
+                                        <Setter Property="Opacity" Value="0.9"/>
+                                    </DataTrigger>
+                                    
+                                    <!-- 🚗 Обычная машина -->
                                     <DataTrigger Binding="{Binding Type}" Value="Car">
                                         <Setter Property="Fill" Value="#2196F3"/>
+                                    </DataTrigger>
+                                    
+                                    <!-- 🚑 Аварийная служба (серая, крупнее) -->
+                                    <DataTrigger Binding="{Binding Type}" Value="Car_Emergency">
+                                        <Setter Property="Fill" Value="#666666"/>
+                                        <Setter Property="Width" Value="28"/>
+                                        <Setter Property="Height" Value="28"/>
+                                    </DataTrigger>
+                                    
+                                    <!-- 🚛 Эвакуируемое авто (полупрозрачное) -->
+                                    <DataTrigger Binding="{Binding Type}" Value="Car_Towed">
+                                        <Setter Property="Fill" Value="#A0C4FF"/>
+                                        <Setter Property="Opacity" Value="0.7"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
