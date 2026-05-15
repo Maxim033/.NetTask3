@@ -20,7 +20,8 @@ namespace Simulation.Core.Simulation
 
     public class AccidentEventArgs : EventArgs
     {
-        public double X { get; } public double Y { get; }
+        public double X { get; }
+        public double Y { get; }
         public AccidentEventArgs(double x, double y) { X = x; Y = y; }
     }
 
@@ -43,11 +44,10 @@ namespace Simulation.Core.Simulation
         private double CrosswalkCenterY => _config.CanvasHeight / 2;
         private double CrosswalkHalfH => 55;
         private double CrosswalkTopY => CrosswalkCenterY - CrosswalkHalfH;
-        
         private double StopLineY => CrosswalkTopY - 80;
         
         private const double SafeCarDistance = 70;
-        private const double SmoothFactor = 0.12; // Плавность изменения скорости
+        private const double SmoothFactor = 0.12;
 
         public event EventHandler<TrafficLightChangedEventArgs>? LightChanged;
         public event EventHandler<AccidentEventArgs>? AccidentOccurred;
@@ -96,8 +96,7 @@ namespace Simulation.Core.Simulation
 
             foreach (var c in _entities.OfType<Car>().Where(c => !c.IsEmergency && !c.HasCrashed))
             {
-                // На красный останавливаем только ДО стоп-линии
-                c.IsStopped = carsCanGo ? false : (c.Y < StopLineY);
+                c.IsStopped = c.IsReckless ? false : (carsCanGo ? false : (c.Y < StopLineY));
             }
 
             foreach (var p in _entities.OfType<Pedestrian>())
@@ -113,57 +112,45 @@ namespace Simulation.Core.Simulation
                 var car = cars[i];
                 if (car.IsEmergency || car.HasCrashed) continue;
 
-                
                 double desiredSpeed = _config.CarSpeed;
 
-                
-                if (_lightState == TrafficLightState.RedForCars && car.Y < StopLineY)
+                if (!car.IsReckless && _lightState == TrafficLightState.RedForCars && car.Y < StopLineY)
                 {
                     double distToStop = StopLineY - car.Y;
-                    if (distToStop < 120) // Начинаем тормозить за 120px
-                    {
+                    if (distToStop < 120)
                         desiredSpeed = _config.CarSpeed * (distToStop / 120);
-                    }
-                    if (distToStop <= 5) desiredSpeed = 0; // Полный стоп
+                    if (distToStop <= 5) desiredSpeed = 0;
                 }
 
-                
-                if (i < cars.Count - 1)
+                if (i < cars.Count - 1 && !car.IsReckless)
                 {
                     double gap = cars[i + 1].Y - car.Y;
                     if (gap < SafeCarDistance + 30)
-                    {
                         desiredSpeed = Math.Min(desiredSpeed, _config.CarSpeed * (gap / (SafeCarDistance + 30)));
-                    }
                 }
 
                 
                 car.Speed += (desiredSpeed - car.Speed) * SmoothFactor;
-                
-                // Движение только если скорость заметна
                 if (car.Speed > 0.05) car.Y += car.Speed;
 
                 // Респавн
                 if (car.Y > _config.CanvasHeight + 30)
                 {
                     car.Y = -100 - _random.Next(50, 150);
-                    car.Speed = _config.CarSpeed; // Сброс на макс. скорость
-                    car.HasCrashed = false; car.IsTowed = false; car.TowTarget = null;
+                    car.Speed = _config.CarSpeed;
+                    car.HasCrashed = false;
+                    car.IsTowed = false;
+                    car.TowTarget = null;
+                    // 15% шанс стать лихачом при появлении
+                    car.IsReckless = _random.NextDouble() < 0.15;
                 }
             }
 
-            
             double leftSidewalk = _config.CanvasWidth / 2 - 100;
             double rightSidewalk = _config.CanvasWidth / 2 + 100;
 
             foreach (var p in _entities.OfType<Pedestrian>().Where(p => p.IsActive))
             {
-                if (p.IsInjured)
-                {
-                    p.InjuryTime += _config.SimulationTickMs / 1000.0;
-                    continue;
-                }
-
                 if (p.IsCrossing)
                 {
                     p.X += p.Speed * p.Direction;
@@ -176,7 +163,6 @@ namespace Simulation.Core.Simulation
                 }
             }
 
-            
             foreach (var truck in _entities.OfType<Car>().Where(c => c.IsEmergency && c.IsActive))
             {
                 truck.Y += truck.Speed;
@@ -184,57 +170,55 @@ namespace Simulation.Core.Simulation
                 {
                     truck.IsActive = false;
                     foreach (var towed in _entities.OfType<Car>().Where(t => t.TowTarget == truck)) towed.IsActive = false;
-                    foreach (var injured in _entities.OfType<Pedestrian>().Where(p => p.IsInjured)) injured.IsActive = false;
                 }
             }
 
-            
             foreach (var towed in _entities.OfType<Car>().Where(c => c.IsTowed && c.IsActive))
             {
                 if (towed.TowTarget is Car target && target.IsActive)
-                {
                     towed.Y += (target.Y - towed.TowOffsetY - towed.Y) * 0.15;
-                }
             }
         }
 
+        
         private void CheckAccidents()
         {
-            if (_random.NextDouble() > 0.12) return;
+            var cars = _entities.OfType<Car>()
+                                 .Where(c => c.IsActive && !c.HasCrashed && !c.IsEmergency && !c.IsTowed)
+                                 .OrderBy(c => c.Y)
+                                 .ToList();
 
-            var peds = _entities.OfType<Pedestrian>().Where(p => p.IsActive && p.IsCrossing).ToList();
-            var cars = _entities.OfType<Car>().Where(c => c.IsActive && !c.IsEmergency && !c.HasCrashed).ToList();
-
-            foreach (var p in peds)
+            for (int i = 0; i < cars.Count - 1; i++)
             {
-                foreach (var c in cars)
-                {
-                    bool inZone = c.Y > (CrosswalkCenterY - 40) && c.Y < (CrosswalkCenterY + 40);
-                    bool onRoad = p.X > (_config.CanvasWidth / 2 - 60) && p.X < (_config.CanvasWidth / 2 + 60);
-                    bool hit = Math.Abs(c.X - p.X) < 30 && Math.Abs(c.Y - p.Y) < 30;
+                var rearCar = cars[i];
+                var frontCar = cars[i + 1];
 
-                    if (inZone && onRoad && hit)
-                    {
-                        TriggerAccident(c, p);
-                        return;
-                    }
+                
+                double distY = frontCar.Y - rearCar.Y;
+                double distX = Math.Abs(rearCar.X - frontCar.X);
+
+                if (distX < 30 && distY < 40 && distY > -10)
+                {
+                    TriggerCarAccident(rearCar, frontCar);
+                    return;
                 }
             }
         }
 
-        private void TriggerAccident(Car car, Pedestrian pedestrian)
+        private void TriggerCarAccident(Car rearCar, Car frontCar)
         {
-            car.HasCrashed = true; car.IsStopped = true;
-            pedestrian.IsInjured = true; pedestrian.IsCrossing = false; pedestrian.InjuryTime = 0;
+            rearCar.HasCrashed = true;
+            rearCar.IsStopped = true;
+            frontCar.IsStopped = true; 
 
-            AccidentOccurred?.Invoke(this, new AccidentEventArgs(car.X, car.Y));
-            Debug.WriteLine($"💥 ДТП! Создаю скорую в ({car.X:F0}, {car.Y - 90:F0})");
+            AccidentOccurred?.Invoke(this, new AccidentEventArgs(rearCar.X, rearCar.Y));
+            Debug.WriteLine($"ДТП! Столкновение автомобилей. Координаты: ({rearCar.X:F0}, {rearCar.Y:F0})");
 
             
             var towTruck = new Car
             {
-                X = car.X,
-                Y = car.Y - 90, 
+                X = rearCar.X,
+                Y = rearCar.Y - 90,
                 Speed = 1.8,
                 IsActive = true,
                 IsEmergency = true,
@@ -242,8 +226,9 @@ namespace Simulation.Core.Simulation
             };
             _entities.Add(towTruck);
 
-            car.IsTowed = true;
-            car.TowTarget = towTruck;
+            
+            rearCar.IsTowed = true;
+            rearCar.TowTarget = towTruck;
         }
 
         public void Dispose() => _cts?.Dispose();

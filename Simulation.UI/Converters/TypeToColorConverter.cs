@@ -11,8 +11,8 @@ namespace Simulation.UI.Converters
         {
             return value?.ToString() switch
             {
-                "Car_Emergency" => Brushes.Gray,  // Серая точка аварийной службы
-                "Car_Towed"     => Brushes.LightBlue, // Сбитое авто (чуть светлее)
+                "Car_Emergency" => Brushes.Gray,  
+                "Car_Towed"     => Brushes.LightBlue, 
                 "Car"           => Brushes.Blue,
                 "Pedestrian"    => Brushes.Green,
                 _               => Brushes.Gray

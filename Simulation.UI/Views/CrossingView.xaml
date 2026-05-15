@@ -68,32 +68,24 @@
                             <Style TargetType="Ellipse">
                                 <Setter Property="Fill" Value="Gray"/>
                                 <Style.Triggers>
-                                    <!-- 🚶 Обычный пешеход -->
+                                    
                                     <DataTrigger Binding="{Binding Type}" Value="Pedestrian">
                                         <Setter Property="Fill" Value="#4CAF50"/>
                                     </DataTrigger>
+                                                                                                           
                                     
-                                    <!-- 🔥 Раненый пешеход (красный, чуть больше) -->
-                                    <DataTrigger Binding="{Binding Type}" Value="Pedestrian_Injured">
-                                        <Setter Property="Fill" Value="#E53935"/>
-                                        <Setter Property="Width" Value="28"/>
-                                        <Setter Property="Height" Value="28"/>
-                                        <Setter Property="Opacity" Value="0.9"/>
-                                    </DataTrigger>
-                                    
-                                    <!-- 🚗 Обычная машина -->
                                     <DataTrigger Binding="{Binding Type}" Value="Car">
                                         <Setter Property="Fill" Value="#2196F3"/>
                                     </DataTrigger>
                                     
-                                    <!-- 🚑 Аварийная служба (серая, крупнее) -->
+                                    
                                     <DataTrigger Binding="{Binding Type}" Value="Car_Emergency">
                                         <Setter Property="Fill" Value="#666666"/>
                                         <Setter Property="Width" Value="28"/>
                                         <Setter Property="Height" Value="28"/>
                                     </DataTrigger>
                                     
-                                    <!-- 🚛 Эвакуируемое авто (полупрозрачное) -->
+                                    
                                     <DataTrigger Binding="{Binding Type}" Value="Car_Towed">
                                         <Setter Property="Fill" Value="#A0C4FF"/>
                                         <Setter Property="Opacity" Value="0.7"/>

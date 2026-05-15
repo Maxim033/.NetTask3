@@ -9,6 +9,6 @@ namespace Simulation.Core.Models
         
         
         public bool IsInjured { get; set; }
-        public double InjuryTime { get; set; } // время с момента ДТП
+        public double InjuryTime { get; set; } 
     }
 }

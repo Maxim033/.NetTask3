@@ -9,6 +9,6 @@ namespace Simulation.Core.Simulation
         public int SimulationTickMs { get; init; } = 50;
         public double PedestrianSpeed { get; init; } = 2.0;
         public double CarSpeed { get; init; } = 4.0;
-        public double CrossingX { get; init; } = 400; // X координата перехода
+        public double CrossingX { get; init; } = 400; 
     }
 }

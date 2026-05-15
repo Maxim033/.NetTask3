@@ -15,7 +15,7 @@ namespace Simulation.Core.Simulation
             var report = new StringBuilder();
             foreach (var entity in entities)
             {
-                // Получаем все публичные свойства через рефлексию
+                
                 var properties = entity.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
                 report.AppendLine($"--- {entity.GetType().Name} (ID: {entity.Id}) ---");
                 

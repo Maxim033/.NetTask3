@@ -16,6 +16,7 @@ namespace Simulation.UI.ViewModels
     {
         private readonly CrossingSimulator _simulator;
         private readonly Dispatcher _uiDispatcher;
+        private readonly Random _random = new(); 
         private string _lightState = "Красный";
         
         public ObservableCollection<EntityViewModel> Entities { get; } = new();
@@ -39,36 +40,13 @@ namespace Simulation.UI.ViewModels
         {
             double centerX = config.CanvasWidth / 2;
             
-            // 🚶 Пешеходы стартуют с тротуаров (±100px от центра дороги)
-            _simulator.AddEntity(new Pedestrian 
-            { 
-                X = centerX - 100, 
-                Y = config.CanvasHeight / 2 - 20, 
-                Speed = config.PedestrianSpeed, 
-                IsActive = true, 
-                Direction = 1 
-            });
             
-            _simulator.AddEntity(new Pedestrian 
-            { 
-                X = centerX - 120, 
-                Y = config.CanvasHeight / 2 + 20, 
-                Speed = config.PedestrianSpeed, 
-                IsActive = true, 
-                Direction = 1 
-            });
-            
-            _simulator.AddEntity(new Pedestrian 
-            { 
-                X = centerX + 100, 
-                Y = config.CanvasHeight / 2, 
-                Speed = config.PedestrianSpeed, 
-                IsActive = true, 
-                Direction = -1 
-            });
+            _simulator.AddEntity(new Pedestrian { X = centerX - 100, Y = config.CanvasHeight / 2 - 20, Speed = config.PedestrianSpeed, IsActive = true, Direction = 1 });
+            _simulator.AddEntity(new Pedestrian { X = centerX - 120, Y = config.CanvasHeight / 2 + 20, Speed = config.PedestrianSpeed, IsActive = true, Direction = 1 });
+            _simulator.AddEntity(new Pedestrian { X = centerX + 100, Y = config.CanvasHeight / 2, Speed = config.PedestrianSpeed, IsActive = true, Direction = -1 });
 
-            // 🚗 Машины (2 полосы)
-            for (int i = 0; i < 5; i++)
+            
+            for (int i = 0; i < 7; i++)
             {
                 double xOffset = (i % 2 == 0) ? -20 : 20;
                 _simulator.AddEntity(new Car
@@ -80,7 +58,8 @@ namespace Simulation.UI.ViewModels
                     Lane = i % 2,
                     Direction = 1,
                     IsEmergency = false,
-                    IsStopped = false
+                    IsStopped = false,
+                    IsReckless = _random.NextDouble() < 0.15 
                 });
             }
         }
@@ -98,20 +77,12 @@ namespace Simulation.UI.ViewModels
                 var vm = Entities.FirstOrDefault(x => x.Id.Equals(e.Entity.Id));
                 if (vm == null)
                 {
-                    vm = new EntityViewModel 
-                    { 
-                        Id = e.Entity.Id, 
-                        X = e.Entity.X, 
-                        Y = e.Entity.Y, 
-                        IsVisible = e.Entity.IsActive 
-                    };
+                    vm = new EntityViewModel { Id = e.Entity.Id, X = e.Entity.X, Y = e.Entity.Y, IsVisible = e.Entity.IsActive };
                     
-                    // 🔥 Маппинг типов для XAML (включая раненого пешехода)
                     vm.Type = e.Entity switch
                     {
                         Car c when c.IsEmergency => "Car_Emergency",
                         Car c when c.IsTowed     => "Car_Towed",
-                        Pedestrian p when p.IsInjured => "Pedestrian_Injured",
                         Car                      => "Car",
                         Pedestrian               => "Pedestrian",
                         _                        => "Unknown"
@@ -129,7 +100,7 @@ namespace Simulation.UI.ViewModels
         }
 
         private void OnAccidentOccurred(object? sender, AccidentEventArgs e) =>
-            _uiDispatcher.InvokeAsync(() => LightState = "⚠️ АВАРИЯ");
+            _uiDispatcher.InvokeAsync(() => LightState = "АВАРИЯ");
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

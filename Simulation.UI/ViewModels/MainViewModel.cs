@@ -38,7 +38,7 @@ namespace Simulation.UI.ViewModels
         }
     }
 
-    // 🔑 Исправленный класс службы (соответствует интерфейсу IEmergencyService)
+    
     public class MockEmergencyService : IEmergencyService
     {
         public async Task DispatchAsync(double targetX, double targetY)
